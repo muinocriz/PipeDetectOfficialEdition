@@ -14,7 +14,6 @@ using System.Windows;
 
 namespace MvvmLight4.ViewModel
 {
-    //not change
     public class VideoViewModel : ViewModelBase
     {
         public VideoViewModel()
@@ -68,7 +67,7 @@ namespace MvvmLight4.ViewModel
         }
 
         /// <summary>
-        /// 加载
+        /// 加载命令
         /// </summary>
         public RelayCommand WinLoadedCommand { get; private set; }
 
@@ -91,7 +90,6 @@ namespace MvvmLight4.ViewModel
                 default:
                     {
                         //选中->未选中
-                        //MessageBox.Show("选中->未选中");
                         if (SelectList.Contains(p))
                             SelectList.Remove(p);
                         break;

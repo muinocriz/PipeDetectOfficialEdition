@@ -107,7 +107,7 @@ namespace MvvmLight4.ViewModel
             }
             catch (Exception e)
             {
-                MessageBox.Show("读取文件时发生异常,请查看文件夹中分帧文件是否正常存放，在关闭标注窗口后请重新选择文件:\n异常描述：\n" + e.ToString());
+                MessageBox.Show("读取文件时发生异常,请查看文件夹中分帧文件存放是否正常，在关闭标注窗口后请重新选择文件:\n异常描述：\n" + e.ToString());
                 return false;
             }
         }

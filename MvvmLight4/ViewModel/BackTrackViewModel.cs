@@ -23,29 +23,11 @@ namespace MvvmLight4.ViewModel
         {
             AssignCommands();
 
-            //Messenger.Default.Register<List<int>>(this, "DVM2BTVM", msg =>
-            //{
-            //    VideoIds = msg;
-            //});
-
-            ////调试数据，使用请删除或注释
-            //VideoIds.Add(72);
-            //VideoIds.Add(73);
-            ////调试数据，使用请删除或注释
-
             Messenger.Default.Register<List<int>>(this, "DVM2BTVM", msg =>
             {
                 Debug.WriteLine("backtrack ViewModel get taskID: " + msg.ToString());
                 TaskIds = msg;
             });
-
-            //调试数据，使用请删除或注释
-            //VideoIds.Add(72);
-            //VideoIds.Add(73);
-            //string videoIdsJSON = TaskService.GetService().GetVideosByTaskId(taskId);
-            //VideoIds = JsonConvert.DeserializeObject<List<int>>(videoIdsJSON);
-            //调试数据，使用请删除或注释
-             
 
             InitCombobox();
 
@@ -159,9 +141,6 @@ namespace MvvmLight4.ViewModel
         public RelayCommand LoadedCmd { get; private set; }
         private void ExecuteLoadedCmd()
         {
-            //初始化元数据+异常信息的组合
-            //AbnormalVMs = AbnormalService.GetService().SelectAll(VideoIds);
-            
             ///修改
             ///为了考虑以后可能传递多个taskId
             ///将它存入List<int>中，方便修改
@@ -194,11 +173,10 @@ namespace MvvmLight4.ViewModel
         {
             ///修改
             ///将该异常的STATE修改为2000
-            AbnormalService.GetService().ChangeState(p.AbnormalId,2000);
+            AbnormalService.GetService().ChangeState(p.AbnormalId, 2000);
 
             Messenger.Default.Send("enableDeleteBtn", "BTVM2BTV");
             stop = true;
-            //tokenSource.Cancel();
             //更新左下角显示区域
             SelectedAVM = p;
             CombboxItem = CombboxList[p.Abnormal.Type];
@@ -224,8 +202,6 @@ namespace MvvmLight4.ViewModel
                 player.Calculate(imagePath.Count, 120);
 
                 //播放函数
-
-
                 var t = new Task(() =>
                 {
                     int nowPic = player.StartNum;
