@@ -26,6 +26,9 @@
         <i:EventTrigger EventName="Loaded">
             <mvvm:EventToCommand Command="{Binding LoadedCmd}" />
         </i:EventTrigger>
+        <i:EventTrigger EventName="Closed">
+            <mvvm:EventToCommand Command="{Binding ClosedCmd}" />
+        </i:EventTrigger>
     </i:Interaction.Triggers>
     <Grid>
         <Grid.Resources>
@@ -168,7 +171,6 @@
                 Grid.Row="0"
                 Height="30"
                 HorizontalContentAlignment="Center"
-                Background="Azure"
                 Content="初步筛选列表"
                 FontSize="14"
                 FontWeight="Bold" />
@@ -212,7 +214,7 @@
             <StackPanel
                 Grid.Row="2"
                 Height="60"
-                Background="Azure">
+                Background="#99B8F1F1">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*" />
