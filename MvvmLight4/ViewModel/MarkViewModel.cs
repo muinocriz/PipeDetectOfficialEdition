@@ -260,8 +260,8 @@ namespace MvvmLight4.ViewModel
             if (File.Exists(p + "_1" + ".jpg"))
                 File.Delete(p + "_1" + ".jpg");
             //供测试
-            if (File.Exists(p + "_2" + ".jpg"))
-                File.Delete(p + "_2" + ".jpg");
+            //if (File.Exists(p + "_2" + ".jpg"))
+            //    File.Delete(p + "_2" + ".jpg");
 
         }
         #endregion
@@ -328,17 +328,17 @@ namespace MvvmLight4.ViewModel
             //        break;
             //}
 
-            if (AbnormalType.Type <= 6)
-            {
-                Debug.WriteLine("局部异常");
-                ImageHelper.Caijianpic(imagePath[CurrentFramePosition], path + "_1" + ".jpg", p.X * 1.0 / img.ActualWidth, p.Y * 1.0 / img.ActualHeight, 416, 416);
-                ImageHelper.Caijianpic(imagePath[CurrentFramePosition], path + "_2" + ".jpg", p.X * 1.0 / img.ActualWidth, p.Y * 1.0 / img.ActualHeight, 299, 299);
-            }
-            if (AbnormalType.Type >= 7)
-            {
-                Debug.WriteLine("全局异常");
-                ImageHelper.SavePic(imagePath[CurrentFramePosition], path + "_1" + ".jpg");
-            }
+            //if (AbnormalType.Type <= 6)
+            //{
+            //Debug.WriteLine("局部异常");
+            ImageHelper.Caijianpic(imagePath[CurrentFramePosition], path + "_1" + ".jpg", p.X * 1.0 / img.ActualWidth, p.Y * 1.0 / img.ActualHeight, 416, 416);
+            //ImageHelper.Caijianpic(imagePath[CurrentFramePosition], path + "_2" + ".jpg", p.X * 1.0 / img.ActualWidth, p.Y * 1.0 / img.ActualHeight, 299, 299);
+            //}
+            //if (AbnormalType.Type >= 7)
+            //{
+            //Debug.WriteLine("全局异常");
+            //ImageHelper.SavePic(imagePath[CurrentFramePosition], path + "_1" + ".jpg");
+            //}
             Debug.WriteLine("" + p.X * 1.0 / img.ActualWidth + "---" + p.Y * 1.0 / img.ActualHeight);
 
             MarkModel mark = new MarkModel(Convert.ToString(currentFramePosition), AbnormalType.Type, p.X * 1.0 / img.ActualWidth, p.Y * 1.0 / img.ActualHeight, path);

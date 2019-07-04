@@ -24,7 +24,26 @@ namespace MvvmLight4.View
         {
             InitializeComponent();
             IsNormal = 0;
+            Messenger.Default.Register<String>(this, "BTVM2BTV", GetMsg);
             this.Unloaded += (sender, e) => Messenger.Default.Unregister(this);
+        }
+
+        private void GetMsg(string msg)
+        {
+            if (!string.IsNullOrEmpty(msg))
+            {
+                switch (msg)
+                {
+                    case "enableDeleteBtn":
+                        DeleteBtn.IsEnabled = true;
+                        break;
+                    case "disEnableDeleteBtn":
+                        DeleteBtn.IsEnabled = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
         #region 全屏处理
         /// <summary>
@@ -47,17 +66,10 @@ namespace MvvmLight4.View
         /// </summary>
         private void ChangeScreen()
         {
+            ScreenCtlSP.Visibility = Visibility.Collapsed;
             DataGrid.Visibility = Visibility.Collapsed;
-            ControlSP.Visibility = Visibility.Collapsed;
             DetailSP.Visibility = Visibility.Collapsed;
-            MainWin.WindowState = WindowState.Maximized;
-            MainWin.WindowStyle = WindowStyle.None;
-            MainWin.ShowTitleBar = false;
-            MainWin.ShowMinButton = false;
-            MainWin.ShowMaxRestoreButton = false;
-            MainWin.ShowCloseButton = false;
-            grid.Width = SystemParameters.PrimaryScreenWidth;
-            grid.Height = SystemParameters.PrimaryScreenHeight;
+
             IsNormal = 1;
         }
 
@@ -71,17 +83,9 @@ namespace MvvmLight4.View
         /// </summary>
         private void BackToNormal()
         {
+            ScreenCtlSP.Visibility = Visibility.Visible;
             DataGrid.Visibility = Visibility.Visible;
-            ControlSP.Visibility = Visibility.Visible;
             DetailSP.Visibility = Visibility.Visible;
-            MainWin.WindowStyle = WindowStyle.SingleBorderWindow;
-            MainWin.WindowState = WindowState.Normal;
-            MainWin.ShowTitleBar = true;
-            MainWin.ShowMinButton = true;
-            MainWin.ShowMaxRestoreButton = true;
-            MainWin.ShowCloseButton = true;
-            grid.Width = 400;
-            grid.Height = 300;
             IsNormal = 0;
         }
 

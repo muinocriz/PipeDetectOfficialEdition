@@ -65,6 +65,10 @@
   <PropertyGroup>
     <SignManifests>false</SignManifests>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>
+    </ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="ControlzEx, Version=4.0.0.0, Culture=neutral, PublicKeyToken=69f1c32f803d307e, processorArchitecture=MSIL">
       <HintPath>..\packages\ControlzEx.4.0.0-alpha0218\lib\net45\ControlzEx.dll</HintPath>
@@ -140,6 +144,7 @@
     </ApplicationDefinition>
     <Compile Include="Common\BGConverter.cs" />
     <Compile Include="Common\CmdHelper.cs" />
+    <Compile Include="Common\DetectChooseConverter.cs" />
     <Compile Include="Common\FileComparer.cs" />
     <Compile Include="Common\ImageHelper.cs" />
     <Compile Include="Common\IntToAbnormalConverter.cs" />
@@ -147,6 +152,7 @@
     <Compile Include="Common\IntToDoubleConverter.cs" />
     <Compile Include="Common\MessageHelper.cs" />
     <Compile Include="Common\SqlHelper.cs" />
+    <Compile Include="Common\TimeConverter.cs" />
     <Compile Include="Design\DesignDataService.cs" />
     <Compile Include="Model\AbnormalModel.cs" />
     <Compile Include="Model\AbnormalTypeModel.cs" />
@@ -159,18 +165,23 @@
     <Compile Include="Model\MetaModel.cs" />
     <Compile Include="Model\ModelModel.cs" />
     <Compile Include="Model\PlayerModel.cs" />
+    <Compile Include="Model\TaskModel.cs" />
     <Compile Include="Service\AbnormalService.cs" />
     <Compile Include="Service\ExportService.cs" />
     <Compile Include="Service\FileDialogService.cs" />
     <Compile Include="Service\IAbnormalService.cs" />
     <Compile Include="Service\IExportService.cs" />
     <Compile Include="Service\IFileDialogService.cs" />
+    <Compile Include="Service\IInitService.cs" />
     <Compile Include="Service\IMetaService.cs" />
     <Compile Include="Service\IModelService.cs" />
+    <Compile Include="Service\InitService.cs" />
     <Compile Include="Service\ISaveService.cs" />
+    <Compile Include="Service\ITaskService.cs" />
     <Compile Include="Service\MetaService.cs" />
     <Compile Include="Service\ModelService.cs" />
     <Compile Include="Service\SaveService.cs" />
+    <Compile Include="Service\TaskService.cs" />
     <Compile Include="ViewModel\BackTrackViewModel.cs" />
     <Compile Include="ViewModel\AbnormalViewModel.cs" />
     <Compile Include="ViewModel\DetectViewModel.cs" />
@@ -309,8 +320,14 @@
     <Resource Include="Image\excel.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Content Include="Util\1.exe">
+    <Content Include="Util\changeModelName.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Util\main.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Util\main.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Util\testpipe.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -395,9 +412,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Image\default.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Util\try.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="Image\model.png">

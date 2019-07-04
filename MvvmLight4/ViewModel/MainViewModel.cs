@@ -1,5 +1,10 @@
-﻿using GalaSoft.MvvmLight;
+﻿using System;
+using System.IO;
+using GalaSoft.MvvmLight;
+using GalaSoft.MvvmLight.CommandWpf;
+using GalaSoft.MvvmLight.Messaging;
 using MvvmLight4.Model;
+using MvvmLight4.Service;
 
 namespace MvvmLight4.ViewModel
 {
@@ -11,47 +16,47 @@ namespace MvvmLight4.ViewModel
     /// </summary>
     public class MainViewModel : ViewModelBase
     {
-        private readonly IDataService _dataService;
-
-        /// <summary>
-        /// The <see cref="WelcomeTitle" /> property's name.
-        /// </summary>
-        public const string WelcomeTitlePropertyName = "WelcomeTitle";
-
-        private string _welcomeTitle = string.Empty;
-
-        /// <summary>
-        /// Gets the WelcomeTitle property.
-        /// Changes to that property's value raise the PropertyChanged event. 
-        /// </summary>
-        public string WelcomeTitle
+        public MainViewModel()
         {
-            get
-            {
-                return _welcomeTitle;
-            }
-            set
-            {
-                Set(ref _welcomeTitle, value);
-            }
+            AssignCommands();
         }
 
-        /// <summary>
-        /// Initializes a new instance of the MainViewModel class.
-        /// </summary>
-        public MainViewModel(IDataService dataService)
+        public RelayCommand LoadedCmd { get; private set; }
+        private void AssignCommands()
         {
-            _dataService = dataService;
-            _dataService.GetData(
-                (item, error) =>
-                {
-                    if (error != null)
-                    {
-                        return;
-                    }
+            LoadedCmd = new RelayCommand(() => ExecuteLoadedCmd());
+        }
 
-                    WelcomeTitle = item.Title;
-                });
+        private void ExecuteLoadedCmd()
+        {
+            string dbName = "data.sqlite";
+            if (!File.Exists(dbName))
+            {
+                Console.WriteLine("数据库不存在");
+                int result = InitService.GetService().InitDatabase(dbName);
+                if(result<0)
+                {
+                    Console.WriteLine("创建出错");
+                }
+                else
+                {
+                    Console.WriteLine("创建成功：{0}",result);
+                }
+            }
+
+            //判断最后一次任务是否有未查看的异常项目
+            int lastTaskId = TaskService.GetService().GetLastTaskId();
+            if(lastTaskId>=0)
+            {
+                //判断本次任务是否有未查看的任务
+                int videoNotWatched = AbnormalService.GetService().SearchLastTaskById(lastTaskId);
+                if (videoNotWatched > 0)
+                {
+                    //存在未观看项目
+                    //通过消息机制弹出提示
+                    Messenger.Default.Send(videoNotWatched, "videoNotWatched");
+                }
+            }
         }
     }
 }

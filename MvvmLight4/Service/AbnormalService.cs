@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,7 +78,7 @@ namespace MvvmLight4.Service
             {
                 conn.Open();
                 var sql = @"SELECT FRAMEPATH FROM TB_METADATA WHERE ID = @ID;";
-                var result= conn.Query(sql, new { ID = id }).FirstOrDefault();
+                var result = conn.Query(sql, new { ID = id }).FirstOrDefault();
                 return result.FRAMEPATH;
             }
         }
@@ -110,7 +111,7 @@ namespace MvvmLight4.Service
                 foreach (var item in dynamics)
                 {
                     ComplexInfoModel c = new ComplexInfoModel();
-                    c.Key= Convert.ToString(item.VIDEOID);
+                    c.Key = Convert.ToString(item.VIDEOID);
                     c.Text = item.TASKCODE;
                     l.Add(c);
                 }
@@ -131,7 +132,7 @@ namespace MvvmLight4.Service
             {
                 conn.Open();
                 var sql = @"SELECT * FROM TB_ABNORMAL,TB_METADATA WHERE TB_ABNORMAL.VIDEOID=TB_METADATA.ID AND TB_ABNORMAL.VIDEOID=@id;";
-                IEnumerable<dynamic> dynamics = conn.Query(sql,new { id });
+                IEnumerable<dynamic> dynamics = conn.Query(sql, new { id });
                 foreach (var item in dynamics)
                 {
                     MetaModel mm = new MetaModel();
@@ -169,8 +170,8 @@ namespace MvvmLight4.Service
                 conn.Open();
                 using (var trans = conn.BeginTransaction())
                 {
-                    var sql = @"INSERT INTO TB_ABNORMAL(VIDEOID,POSITION,TYPE) VALUES(@VideoId,@Position,@Type);";
-                    var executeResult =  conn.Execute(sql,abnormalModels,trans);
+                    var sql = @"INSERT INTO TB_ABNORMAL(VIDEOID,POSITION,TYPE,QXWZ,STATE,TASKID) VALUES(@VideoId,@Position,@Type,@QXWZ,@State,@TaskId);";
+                    var executeResult = conn.Execute(sql, abnormalModels, trans);
                     trans.Commit();
                     return executeResult;
                 }
@@ -219,6 +220,122 @@ namespace MvvmLight4.Service
                 }
             }
             return models;
+        }
+
+        /// <summary>
+        /// 人工回溯界面
+        /// 通过异常id删除一条异常列表信息
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public int DeleteItem(int id)
+        {
+            using (IDbConnection conn = SqlHelper.GetConnection())
+            {
+                conn.Open();
+                var sql = @"DELETE FROM TB_ABNORMAL WHERE ID=@id;";
+                int result = conn.Execute(sql, new { id });
+                return result;
+            }
+        }
+
+        public ObservableCollection<AbnormalViewModel> SelectAllWithoutWatch(List<int> TaskIds)
+        {
+            ObservableCollection<AbnormalViewModel> avms = new ObservableCollection<AbnormalViewModel>();
+            using (IDbConnection conn = SqlHelper.GetConnection())
+            {
+                conn.Open();
+                var sql = @"SELECT ADDR,PIPECODE,PIPETYPE,STARTTIME,TB_ABNORMAL.TYPE,
+                                POSITION,TB_ABNORMAL.ID AS TID,VIDEOID AS VID,
+                                FRAMEPATH,STATE,TASKID 
+                            FROM TB_ABNORMAL,TB_METADATA 
+                            WHERE TASKID IN @ids 
+                                AND STATE==1000 
+                                AND VID=TB_METADATA.ID;";
+                IEnumerable<dynamic> dynamics = conn.Query(sql, new { ids = TaskIds.ToArray() });
+                foreach (var item in dynamics)
+                {
+                    MetaModel mm = new MetaModel();
+                    AbnormalModel am = new AbnormalModel();
+                    AbnormalViewModel avm = new AbnormalViewModel();
+
+                    mm.Addr = item.ADDR;
+                    mm.PipeCode = item.PIPECODE;
+                    mm.PipeType = (int)item.PIPETYPE;
+                    mm.FramePath = item.FRAMEPATH;
+
+                    if (!string.IsNullOrEmpty(item.STARTTIME))
+                        mm.StartTime = item.STARTTIME;
+                    else
+                        mm.StartTime = "未填写";
+
+                    am.VideoId = (int)item.VID;
+                    am.Type = (int)item.TYPE;
+                    am.Position = item.POSITION;
+
+                    //新加的状态和任务编号
+                    am.State = (int)item.STATE;
+                    am.TaskId = (int)item.TASKID;
+
+                    avm.AbnormalId = (int)item.TID;
+                    Debug.WriteLine("get tid: " + avm.AbnormalId);
+                    avm.Meta = mm;
+                    avm.Abnormal = am;
+                    avms.Add(avm);
+                }
+            }
+            return avms;
+        }
+
+        /// <summary>
+        /// 人工回溯界面
+        /// 修改异常的查看状态
+        /// </summary>
+        /// <param name="abnormalId">TB_ABNORMAL的id</param>
+        /// <param name="state">要修改到的状态</param>
+        public void ChangeState(int abnormalId, int state)
+        {
+            using (IDbConnection conn = SqlHelper.GetConnection())
+            {
+                conn.Open();
+                if(state==2000)
+                {
+                    var sql = @"UPDATE TB_ABNORMAL SET STATE = @state WHERE ID = @abnormalId AND STATE!=3000;";
+                    conn.Execute(sql, new { state, abnormalId });
+                }
+                else
+                {
+                    var sql = @"UPDATE TB_ABNORMAL SET STATE = @state WHERE ID = @abnormalId;";
+                    conn.Execute(sql, new { state, abnormalId });
+                }
+                
+                Debug.WriteLine(abnormalId + " has changed to " + state);
+            }
+        }
+
+        /// <summary>
+        /// 开始界面
+        /// 通过任务id查看是否有未观看的项目
+        /// </summary>
+        /// <param name="taskId"></param>
+        /// <returns></returns>
+        public int SearchLastTaskById(int taskId)
+        {
+            using (IDbConnection conn = SqlHelper.GetConnection())
+            {
+                conn.Open();
+                var sql = @"SELECT COUNT(*) AS COUNT FROM TB_ABNORMAL WHERE TASKID = @taskId AND STATE == 1000;";
+                var result = conn.Query(sql, new { taskId }).SingleOrDefault();
+                if(result!=null || result.COUNT != null)
+                {
+                    int a = Convert.ToInt32(result.COUNT);
+                    return a;
+                }
+                else
+                {
+                    return 0;
+                }
+            }
         }
     }
 }

@@ -116,6 +116,26 @@ namespace MvvmLight4.ViewModel
         /// </summary>
         public RelayCommand LoadedCmd { get; private set; }
 
+        public RelayCommand ClosedCmd { get; private set; }
+
+        private void ExecuteClosedCmd()
+        {
+            if (pipeReader != null && pipeReader.IsConnected)
+            {
+                pipeReader.Close();
+            }
+
+            if (worker != null && worker.IsBusy)
+            {
+                worker.CancelAsync();
+            }
+
+            if (trainProcessPID >= 0)
+            {
+                ColseFun(trainProcessPID);
+            }
+        }
+
         /// <summary>
         /// 预处理函数
         /// </summary>
@@ -125,7 +145,7 @@ namespace MvvmLight4.ViewModel
         {
             var t = new Task(() =>
             {
-                Process p = CmdHelper.RunProcess("Util/try.exe", directory);
+                Process p = CmdHelper.RunProcess("Util/main.exe ", ("-pre "+directory));
                 p.Start();
                 Console.WriteLine("pid:" + p.Id);
                 Console.WriteLine("python is start");
@@ -214,25 +234,25 @@ namespace MvvmLight4.ViewModel
 
             var t = new Task(() =>
             {
-                Process p = CmdHelper.RunProcess(@"Util/1.exe", "c");
+                Process p = CmdHelper.RunProcess(@"Util/main.exe", ("-train "+json));
                 p.Start();
                 trainProcessPID = p.Id;
                 Console.WriteLine("trainProcessPID:" + trainProcessPID);
-                Console.WriteLine("wait for exit");
+                Console.WriteLine("trainProcess wait for exit");
                 p.WaitForExit();
-                Console.WriteLine("exited");
+                Console.WriteLine("trainProcess exited");
                 p.Close();
-                Console.WriteLine("closed");
+                Console.WriteLine("trainProcess closed");
             });
             t.Start();
             t.ContinueWith((task) =>
             {
                 if (task.IsCompleted)
-                    Console.WriteLine("已完成");
+                    Console.WriteLine("训练任务已完成");
                 else if (task.IsCanceled)
-                    MessageBox.Show("已取消");
+                    MessageBox.Show("训练任务已取消");
                 else if (task.IsFaulted)
-                    MessageBox.Show("任务失败");
+                    MessageBox.Show("训练任务任务失败");
             });
 
             //新建后台进程
@@ -428,7 +448,10 @@ namespace MvvmLight4.ViewModel
             FolderBrowserCmd = new RelayCommand<string>((p) => ExecuteFolderBrowserCmd(p));
             OpenFileCmd = new RelayCommand(() => ExecuteOpenFileCmd());
             StopTrainCmd = new RelayCommand(() => { ColseFun(trainProcessPID); pipeFlag = false; });
+            ClosedCmd = new RelayCommand(() => ExecuteClosedCmd());
         }
+
+
         #endregion
     }
 }

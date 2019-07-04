@@ -3,10 +3,8 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:Controls="http://metro.mahapps.com/winfx/xaml/controls"
-    xmlns:common="clr-namespace:MvvmLight4.Common"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="clr-namespace:System.Windows.Interactivity;assembly=System.Windows.Interactivity"
-    xmlns:local="clr-namespace:MvvmLight4.View"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:mvvm="http://www.galasoft.ch/mvvmlight"
     Title="选择标注文件"
@@ -19,7 +17,6 @@
     mc:Ignorable="d">
     <StackPanel Margin="5">
         <StackPanel.Resources>
-            <common:IntToBoolConverter x:Key="itbc" />
             <Style TargetType="{x:Type Label}">
                 <Setter Property="FontFamily" Value="/MvvmLight4;component/Font/#Source Han Sans CN" />
             </Style>
