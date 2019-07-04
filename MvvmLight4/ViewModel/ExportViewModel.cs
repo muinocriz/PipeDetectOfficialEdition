@@ -151,60 +151,6 @@ namespace MvvmLight4.ViewModel
             }
         }
 
-        public RelayCommand<ExportModel> CheckCmd { get; private set; }
-
-        private bool CanExecuteCheckCmd(ExportModel arg)
-        {
-            return arg != null;
-        }
-
-        private void ExecuteCheckCmd(ExportModel p)
-        {
-            switch (p.IsChoose)
-            {
-                //选中->未选中
-                case -1:
-                    {
-                        break;
-                    }
-                //未选中->选中
-                case 1:
-                    {
-                        if (string.IsNullOrEmpty(p.Byname))
-                            p.Byname = p.Alternative;
-                        break;
-                    }
-            }
-        }
-
-        /// <summary>
-        /// 全选
-        /// </summary>
-        public RelayCommand SelectAllCmd { get; private set; }
-
-        private void ExecuteSelectAllCmd()
-        {
-            foreach (ExportModel item in Exports)
-            {
-                item.IsChoose = 1;
-                ExecuteCheckCmd(item);
-            }
-        }
-
-        /// <summary>
-        /// 全不选
-        /// </summary>
-        public RelayCommand UnSelectAllCmd { get; private set; }
-
-        private void ExecuteUnSelectAllCmd()
-        {
-            foreach (ExportModel item in Exports)
-            {
-                item.IsChoose = -1;
-                ExecuteCheckCmd(item);
-            }
-        }
-
         /// <summary>
         /// 判断批量导出命令
         /// </summary>
@@ -251,35 +197,6 @@ namespace MvvmLight4.ViewModel
             worker.RunWorkerAsync();
         }
 
-        public RelayCommand ExportCmd { get; private set; }
-
-        private bool CanExecuteExportCmd()
-        {
-            return combboxItem != null && !string.IsNullOrEmpty(TargetSource);
-        }
-
-        private void ExecuteExportCmd()
-        {
-            //保存对输出选项的更改到数据库
-            ExportService.GetService().UpdateExport(Exports);
-            //输出逻辑
-            //获得所有要选择的项-别名
-            dict = new Dictionary<string, string>();
-            dict = ExportService.GetService().SelectChoose();
-
-            exportModelsForExcel = new List<ExportModel>();
-            exportModelsForExcel = ExportService.GetService().SelectChooseToList();
-
-            //读取所有属性
-            list = AbnormalService.GetService().ExportByVideoId(Convert.ToInt32(combboxItem.Key));
-            DispatcherHelper.CheckBeginInvokeOnUI(() =>
-            {
-                ProVisiable = Visibility.Visible;
-            });
-
-            worker.RunWorkerAsync();
-        }
-
         public RelayCommand FolderBrowserCmd { get; private set; }
 
         private void ExecuteFolderBrowserCmd()
@@ -306,7 +223,6 @@ namespace MvvmLight4.ViewModel
             switch (Way)
             {
                 case 0:
-                    //SaveService.GetService().SaveXlsxFile(TargetSource, exportModelsForExcel, list);
                     SaveService.GetService().SaveXlsxFileBatch(TargetSource, exportDatas, typeDict);
                     break;
                 case 1:
@@ -329,10 +245,6 @@ namespace MvvmLight4.ViewModel
         private void AssignCommands()
         {
             LoadedCmd = new RelayCommand(() => ExecuteLoadedCmd());
-            //CheckCmd = new RelayCommand<ExportModel>((p) => ExecuteCheckCmd(p), CanExecuteCheckCmd);
-            //SelectAllCmd = new RelayCommand(() => ExecuteSelectAllCmd());
-            //UnSelectAllCmd = new RelayCommand(() => ExecuteUnSelectAllCmd());
-            //ExportCmd = new RelayCommand(() => ExecuteExportCmd(), CanExecuteExportCmd);
             FolderBrowserCmd = new RelayCommand(() => ExecuteFolderBrowserCmd());
             ExportListCmd = new RelayCommand<object>((obj) => ExecuteExportListCmd(obj), CanExecuteExportListCmd);
             CloingCmd = new RelayCommand(() => ExecuteCloingCmd());

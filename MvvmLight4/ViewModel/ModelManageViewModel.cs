@@ -15,7 +15,6 @@ using System.Windows.Controls;
 
 namespace MvvmLight4.ViewModel
 {
-    //not change
     public class ModelManageViewModel : ViewModelBase
     {
         public ModelManageViewModel()

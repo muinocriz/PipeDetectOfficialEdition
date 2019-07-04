@@ -145,7 +145,7 @@ namespace MvvmLight4.ViewModel
         {
             var t = new Task(() =>
             {
-                Process p = CmdHelper.RunProcess("Util/main.exe ", ("-pre "+directory));
+                Process p = CmdHelper.RunProcess("Util/main.exe ", ("-pre " + directory));
                 p.Start();
                 Console.WriteLine("pid:" + p.Id);
                 Console.WriteLine("python is start");
@@ -234,7 +234,7 @@ namespace MvvmLight4.ViewModel
 
             var t = new Task(() =>
             {
-                Process p = CmdHelper.RunProcess(@"Util/main.exe", ("-train "+json));
+                Process p = CmdHelper.RunProcess(@"Util/main.exe", ("-train " + json));
                 p.Start();
                 trainProcessPID = p.Id;
                 Console.WriteLine("trainProcessPID:" + trainProcessPID);
@@ -302,11 +302,6 @@ namespace MvvmLight4.ViewModel
                     case 0:
                         break;
                     case 1:
-                        //收到进度
-                        //if (messages.Length == 2 && int.TryParse(messages[1], out progress))
-                        //{
-                        //    worker.ReportProgress(progress);
-                        //}
                         break;
                     case 2:
                         break;
@@ -352,7 +347,6 @@ namespace MvvmLight4.ViewModel
                     case 64:
                         break;
                     default:
-                        //sleep()
                         break;
                 }
             }
@@ -360,7 +354,6 @@ namespace MvvmLight4.ViewModel
 
         private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            //TrainProgNum = e.ProgressPercentage;
             DispatcherHelper.CheckBeginInvokeOnUI(() =>
             {
                 if (e.UserState != null)
@@ -380,7 +373,6 @@ namespace MvvmLight4.ViewModel
             if (e.Cancelled || e.Error != null)
             {
                 MessageBox.Show(errorMsg);
-                //TrainProgVb = Visibility.Hidden;
             }
             else
             {
@@ -392,7 +384,6 @@ namespace MvvmLight4.ViewModel
                 if (result > 0)
                 {
                     MessageBox.Show(result + "个模型已生成");
-                    //训练部分
                 }
             }
             Thread.Sleep(200);
@@ -450,8 +441,6 @@ namespace MvvmLight4.ViewModel
             StopTrainCmd = new RelayCommand(() => { ColseFun(trainProcessPID); pipeFlag = false; });
             ClosedCmd = new RelayCommand(() => ExecuteClosedCmd());
         }
-
-
         #endregion
     }
 }

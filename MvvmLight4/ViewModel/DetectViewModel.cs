@@ -23,7 +23,6 @@ using System.Windows;
 
 namespace MvvmLight4.ViewModel
 {
-    //not change
     public class DetectViewModel : ViewModelBase
     {
         public DetectViewModel()
@@ -38,7 +37,6 @@ namespace MvvmLight4.ViewModel
                 null
             };
         }
-
 
         #region property
         /// <summary>
@@ -295,7 +293,6 @@ namespace MvvmLight4.ViewModel
             taskVideoList = new List<int>();
             foreach (var item in VideoList)
             {
-                //dict[(int)item.Id] = item.Meta.FramePath;
                 videos.Add(new Video() { Id = (int)item.Id, Path = item.Meta.FramePath, Head = item.Meta.HeadTime, Tail = item.Meta.TailTime });
                 //检测开始时存储了任务包含的视频
                 taskVideoList.Add(Convert.ToInt32(item.Id));
@@ -546,7 +543,6 @@ namespace MvvmLight4.ViewModel
 
         /// <summary>
         /// 打开选择视频文件对话框
-        /// Open Video Select Cmd
         /// </summary>
         public RelayCommand OpenVSC { get; private set; }
 
@@ -563,7 +559,6 @@ namespace MvvmLight4.ViewModel
 
         /// <summary>
         /// 打开人工回溯界面
-        /// Open Back Track Cmd
         /// </summary>
         public RelayCommand OpenBTC { get; private set; }
 
@@ -575,13 +570,6 @@ namespace MvvmLight4.ViewModel
         private void ExecuteOpenBTCmd()
         {
             BackTrackWindow sender = new BackTrackWindow();
-            //List<int> list = new List<int>();
-            //foreach (var item in VideoList)
-            //{
-            //    if (item.Id != null)
-            //        list.Add((int)item.Id);
-            //}
-            //Messenger.Default.Send(list, "DVM2BTVM");
 
             ///修改
             ///检测界面不能直接传递videoId

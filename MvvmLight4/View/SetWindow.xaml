@@ -78,7 +78,6 @@
                             HorizontalAlignment="Right"
                             Command="{Binding SelectAbnormal}"
                             Content="确定" />
-                        <!--<Button Width="80" Height="20" HorizontalAlignment="Right" Content="确定" Click="Button_Click"/>-->
                     </Grid>
                 </Grid>
             </TabItem>
