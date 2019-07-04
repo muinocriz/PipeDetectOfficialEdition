@@ -8,6 +8,7 @@ using MvvmLight4.Service;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -28,19 +29,21 @@ namespace MvvmLight4.ViewModel
                 Debug.WriteLine("backtrack ViewModel get taskID: " + msg.ToString());
                 TaskIds = msg;
             });
+            //测试用数据
+            TaskIds.Add(2);
+            TaskIds.Add(3);
+            //完成请删除
 
             InitCombobox();
-
+            InitWorker();
             DispatcherHelper.Initialize();
-
-            tokenSource = new CancellationTokenSource();
-            token = tokenSource.Token;
         }
 
         #region property
-        private int taskId;
-        private CancellationTokenSource tokenSource;
-        private CancellationToken token;
+        /// <summary>
+        /// 后台进程
+        /// </summary>
+        public BackgroundWorker worker;
         /// <summary>
         /// 图像列表
         /// </summary>
@@ -53,8 +56,6 @@ namespace MvvmLight4.ViewModel
         /// 任务列表
         /// </summary>
         public List<int> TaskIds = new List<int>();
-        private bool stop = false;
-
         private PlayerModel player;
         /// <summary>
         /// 播放类
@@ -141,6 +142,11 @@ namespace MvvmLight4.ViewModel
         public RelayCommand LoadedCmd { get; private set; }
         private void ExecuteLoadedCmd()
         {
+            SelectAllWithoutWatch();
+            Messenger.Default.Send("disEnableDeleteBtn", "BTVM2BTV");
+        }
+        void SelectAllWithoutWatch()
+        {
             ///修改
             ///为了考虑以后可能传递多个taskId
             ///将它存入List<int>中，方便修改
@@ -154,8 +160,6 @@ namespace MvvmLight4.ViewModel
                     ErrorNum++;
                 }
             }
-
-            Messenger.Default.Send("disEnableDeleteBtn", "BTVM2BTV");
         }
 
         #region 选择了DataGrid的某一项
@@ -171,18 +175,29 @@ namespace MvvmLight4.ViewModel
 
         private void ExecuteSelectCommand(AbnormalViewModel p)
         {
-            ///修改
-            ///将该异常的STATE修改为2000
+            Debug.WriteLine("worker.isBusy:" + worker.IsBusy);
+            if (worker.IsBusy)
+            {
+                worker.CancelAsync();
+                return;
+            }
+
+            //将该异常的STATE修改为2000
             AbnormalService.GetService().ChangeState(p.AbnormalId, 2000);
 
             Messenger.Default.Send("enableDeleteBtn", "BTVM2BTV");
-            stop = true;
+
             //更新左下角显示区域
             SelectedAVM = p;
             CombboxItem = CombboxList[p.Abnormal.Type];
 
             //播放视频
             //找到文件
+            InitPlayer(p);
+            worker.RunWorkerAsync(player);
+        }
+        void InitPlayer(AbnormalViewModel p)
+        {
             string folderPath = p.Meta.FramePath;
 
             player = new PlayerModel
@@ -200,27 +215,6 @@ namespace MvvmLight4.ViewModel
                     imagePath.Add(name);
                 }
                 player.Calculate(imagePath.Count, 120);
-
-                //播放函数
-                var t = new Task(() =>
-                {
-                    int nowPic = player.StartNum;
-                    int end = player.EndNum;
-                    stop = false;
-
-                    while (!stop && nowPic <= end)
-                    {
-                        token.ThrowIfCancellationRequested();
-                        DispatcherHelper.CheckBeginInvokeOnUI(() =>
-                        {
-                            ImgSource = imagePath[nowPic];
-                        });
-                        nowPic++;
-                        Thread.Sleep(player.Speed);
-                    }
-                    stop = true;
-                });
-                t.Start();
             }
             catch (PathTooLongException)
             {
@@ -235,14 +229,17 @@ namespace MvvmLight4.ViewModel
                 MessageBox.Show("发生异常：" + e.ToString());
             }
         }
-        // 删除列表项函数
+
         public RelayCommand<int> DeleteCmd { get; private set; }
 
         private bool CanExecuteDeleteCmd(int arg)
         {
             return arg >= 0;
         }
-
+        /// <summary>
+        /// 删除选择项
+        /// </summary>
+        /// <param name="p"></param>
         private void ExecuteDeleteCmd(int p)
         {
             Debug.WriteLine("get abnornal id :" + p);
@@ -330,6 +327,54 @@ namespace MvvmLight4.ViewModel
             SelectCommand = new RelayCommand<AbnormalViewModel>((p) => ExecuteSelectCommand(p), CanExecuteSelectCommand);
             TypeChangedCmd = new RelayCommand(() => ExecuteTypeChangedCmd());
             DeleteCmd = new RelayCommand<int>((p) => ExecuteDeleteCmd(p), CanExecuteDeleteCmd);
+        }
+
+        public void InitWorker()
+        {
+            worker = new BackgroundWorker
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            worker.DoWork += new DoWorkEventHandler(Worker_DoWork);
+            worker.ProgressChanged += new ProgressChangedEventHandler(Worker_ProgressChanged);
+            worker.RunWorkerCompleted += new RunWorkerCompletedEventHandler(Worker_RunWorkerCompleted);
+        }
+
+        private void Worker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            PlayerModel p = (PlayerModel)e.Argument;
+            int nowPic = player.StartNum;
+            int end = player.EndNum;
+
+            while (nowPic <= end)
+            {
+                if (worker.CancellationPending)
+                {
+                    Debug.WriteLine("收到取消信号");
+                    e.Cancel = true;
+                    return;
+                }
+                worker.ReportProgress(nowPic++);
+                Thread.Sleep(player.Speed);
+            }
+        }
+
+        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            DispatcherHelper.CheckBeginInvokeOnUI(() =>
+            {
+                ImgSource = imagePath[e.ProgressPercentage];
+            });
+        }
+
+        private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            Debug.WriteLine("进入完成函数");
+            if (e.Cancelled)
+                Debug.WriteLine("本条目回溯中断");
+            else
+                Debug.WriteLine("本条目回溯完成");
         }
         #endregion
     }
