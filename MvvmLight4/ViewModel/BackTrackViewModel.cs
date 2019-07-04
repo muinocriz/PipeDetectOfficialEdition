@@ -8,15 +8,12 @@ using MvvmLight4.Service;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 
 namespace MvvmLight4.ViewModel
 {
@@ -26,12 +23,29 @@ namespace MvvmLight4.ViewModel
         {
             AssignCommands();
 
+            //Messenger.Default.Register<List<int>>(this, "DVM2BTVM", msg =>
+            //{
+            //    VideoIds = msg;
+            //});
+
+            ////调试数据，使用请删除或注释
+            //VideoIds.Add(72);
+            //VideoIds.Add(73);
+            ////调试数据，使用请删除或注释
+
             Messenger.Default.Register<List<int>>(this, "DVM2BTVM", msg =>
             {
-                VideoIds = msg;
+                Debug.WriteLine("backtrack ViewModel get taskID: " + msg.ToString());
+                TaskIds = msg;
             });
 
-            VideoIds.Add(46);
+            //调试数据，使用请删除或注释
+            //VideoIds.Add(72);
+            //VideoIds.Add(73);
+            //string videoIdsJSON = TaskService.GetService().GetVideosByTaskId(taskId);
+            //VideoIds = JsonConvert.DeserializeObject<List<int>>(videoIdsJSON);
+            //调试数据，使用请删除或注释
+             
 
             InitCombobox();
 
@@ -42,6 +56,7 @@ namespace MvvmLight4.ViewModel
         }
 
         #region property
+        private int taskId;
         private CancellationTokenSource tokenSource;
         private CancellationToken token;
         /// <summary>
@@ -52,6 +67,10 @@ namespace MvvmLight4.ViewModel
         /// 视频列表
         /// </summary>
         public List<int> VideoIds = new List<int>();
+        /// <summary>
+        /// 任务列表
+        /// </summary>
+        public List<int> TaskIds = new List<int>();
         private bool stop = false;
 
         private PlayerModel player;
@@ -141,8 +160,12 @@ namespace MvvmLight4.ViewModel
         private void ExecuteLoadedCmd()
         {
             //初始化元数据+异常信息的组合
-            AbnormalVMs = AbnormalService.GetService().SelectAll(VideoIds);
-
+            //AbnormalVMs = AbnormalService.GetService().SelectAll(VideoIds);
+            
+            ///修改
+            ///为了考虑以后可能传递多个taskId
+            ///将它存入List<int>中，方便修改
+            AbnormalVMs = AbnormalService.GetService().SelectAllWithoutWatch(TaskIds);
             ErrorNum = 0;
 
             foreach (var item in AbnormalVMs)
@@ -152,6 +175,8 @@ namespace MvvmLight4.ViewModel
                     ErrorNum++;
                 }
             }
+
+            Messenger.Default.Send("disEnableDeleteBtn", "BTVM2BTV");
         }
 
         #region 选择了DataGrid的某一项
@@ -167,6 +192,11 @@ namespace MvvmLight4.ViewModel
 
         private void ExecuteSelectCommand(AbnormalViewModel p)
         {
+            ///修改
+            ///将该异常的STATE修改为2000
+            AbnormalService.GetService().ChangeState(p.AbnormalId,2000);
+
+            Messenger.Default.Send("enableDeleteBtn", "BTVM2BTV");
             stop = true;
             //tokenSource.Cancel();
             //更新左下角显示区域
@@ -216,18 +246,56 @@ namespace MvvmLight4.ViewModel
                 });
                 t.Start();
             }
-            catch (PathTooLongException e)
+            catch (PathTooLongException)
             {
                 MessageBox.Show("文件路径过长");
             }
-            catch (ArgumentException e)
+            catch (ArgumentException)
             {
                 MessageBox.Show("该路径下文件错误");
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 MessageBox.Show("发生异常：" + e.ToString());
             }
+        }
+        // 删除列表项函数
+        public RelayCommand<int> DeleteCmd { get; private set; }
+
+        private bool CanExecuteDeleteCmd(int arg)
+        {
+            return arg >= 0;
+        }
+
+        private void ExecuteDeleteCmd(int p)
+        {
+            Debug.WriteLine("get abnornal id :" + p);
+            Messenger.Default.Send("disEnableDeleteBtn", "BTVM2BTV");
+            //修改列表显示
+            for (int i = 0; i < AbnormalVMs.Count; i++)
+            {
+                if (AbnormalVMs[i].AbnormalId == p)
+                {
+                    Debug.WriteLine("get item in AbnormalVMs :" + p);
+                    DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                    {
+                        AbnormalVMs.RemoveAt(i);
+                    });
+                }
+            }
+            //修改右下角展示区显示
+            //重新计算现有的总异常
+            ErrorNum = 0;
+            foreach (var item in abnormalVMs)
+            {
+                if (item.Abnormal.Type != 0 && item.Abnormal.Type != 6)
+                {
+                    ErrorNum++;
+                }
+            }
+            //总数由abnormalVMs.Count直接生成切无需更改
+            //删除数据库
+            AbnormalService.GetService().DeleteItem(p);
         }
         #endregion
         #region ComboxItem被更改
@@ -238,6 +306,10 @@ namespace MvvmLight4.ViewModel
 
         private void ExecuteTypeChangedCmd()
         {
+            ///修改
+            ///将该异常的STATE修改为2000
+            AbnormalService.GetService().ChangeState(SelectedAVM.AbnormalId, 3000);
+
             //修改数据库
             int type = Convert.ToInt32(CombboxItem.Key);
             int result = AbnormalService.GetService().UpdateAbnormalType(SelectedAVM.AbnormalId, type);
@@ -281,6 +353,7 @@ namespace MvvmLight4.ViewModel
             LoadedCmd = new RelayCommand(() => ExecuteLoadedCmd());
             SelectCommand = new RelayCommand<AbnormalViewModel>((p) => ExecuteSelectCommand(p), CanExecuteSelectCommand);
             TypeChangedCmd = new RelayCommand(() => ExecuteTypeChangedCmd());
+            DeleteCmd = new RelayCommand<int>((p) => ExecuteDeleteCmd(p), CanExecuteDeleteCmd);
         }
         #endregion
     }

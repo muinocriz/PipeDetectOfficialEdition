@@ -1,6 +1,12 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
+using GalaSoft.MvvmLight.Messaging;
+using MvvmLight4.Service;
+using MvvmLight4.View;
 using MvvmLight4.ViewModel;
 
 namespace MvvmLight4
@@ -16,7 +22,35 @@ namespace MvvmLight4
         public MainWindow()
         {
             InitializeComponent();
+            Messenger.Default.Register<int>(this, "videoNotWatched", ReceiveMsg);
+            this.Unloaded += (sender, e) => Messenger.Default.Unregister(this);
             Closing += (s, e) => ViewModelLocator.Cleanup();
+        }
+
+        private void ReceiveMsg(int videoNotWatched)
+        {
+            Debug.WriteLine("main window xaml get videoNotWatched count :" + videoNotWatched);
+            string text = "您有" + videoNotWatched + "条异常未查看，是否现在查看？\n\n该消息将在下次启动时重新提示";
+            List<int> list = new List<int>();
+            int taskId = TaskService.GetService().GetLastTaskId();
+            Debug.WriteLine("main window xaml get task id :" + taskId);
+            if (taskId >= 0)
+            {
+                MessageBoxResult result = MessageBox.Show(text, "通知", MessageBoxButton.YesNo);
+                if (result == MessageBoxResult.Yes)
+                {
+                    list.Add(taskId);
+                    BackTrackWindow sender = new BackTrackWindow();
+                    Messenger.Default.Send(list, "DVM2BTVM");
+                    sender.ShowDialog();
+                }
+                else
+                {
+                    return;
+                }
+                
+            }
+            list = null;
         }
 
         private Assembly _assembly = Assembly.GetExecutingAssembly();

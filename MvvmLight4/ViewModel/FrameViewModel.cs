@@ -214,7 +214,7 @@ namespace MvvmLight4.ViewModel
             {
                 case 0:
                     //大图
-                    command = "-i" + " " + videoPath + " " + "-q:v 2 " + target + "\\%6d.jpg";
+                    command = "-i" + " " + videoPath + " " + "-q:v 10 " + target + "\\%6d.jpg";
                     break;
                 case 1:
                     //小图

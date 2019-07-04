@@ -16,6 +16,23 @@ namespace MvvmLight4.Model
             Position = _position;
             Type = _type;
         }
+
+        public AbnormalModel(int _videoId, string _position, int _type, double _qxwz)
+        {
+            VideoId = _videoId;
+            Position = _position;
+            Type = _type;
+            QXWZ = _qxwz;
+        }
+        public AbnormalModel(int _videoId, string _position, int _type, double _qxwz, int _taskId)
+        {
+            VideoId = _videoId;
+            Position = _position;
+            Type = _type;
+            QXWZ = _qxwz;
+            TaskId = _taskId;
+            State = 1000;
+        }
         private int videoId;
         /// <summary>
         /// 异常所属于的视频的Id
@@ -116,5 +133,21 @@ namespace MvvmLight4.Model
             get { return tpmc; }
             set { tpmc = value; }
         }
+
+
+        private int taskId;
+        /// <summary>
+        /// 本次异常所属的任务
+        /// </summary>
+        public int TaskId { get => taskId; set => taskId = value; }
+
+        private int state;
+        /// <summary>
+        /// 异常当前的状态
+        /// 1000：默认状态，被检测但未被查看
+        /// 2000：已被查看
+        /// 3000：已被修改
+        /// </summary>
+        public int State { get => state; set => state = value; }
     }
 }
