@@ -71,6 +71,21 @@
             </Button.Content>
         </Button>
 
+        <!--<Button
+            Grid.Row="2"
+            Grid.Column="0"
+            Margin="5"
+            Tag="BackTrackWindow">
+            <Button.Content>
+                <StackPanel Orientation="Horizontal">
+                    <Image
+                        Width="24"
+                        Height="24"
+                        Source=".\Image\splite.ico" />
+                    <Label Content="测试" />
+                </StackPanel>
+            </Button.Content>
+        </Button>-->
 
         <Button
             Grid.Row="0"

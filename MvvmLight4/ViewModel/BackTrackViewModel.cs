@@ -29,11 +29,12 @@ namespace MvvmLight4.ViewModel
                 Debug.WriteLine("backtrack ViewModel get taskID: " + msg.ToString());
                 TaskIds = msg;
             });
-            //测试用数据
-            TaskIds.Add(2);
-            TaskIds.Add(3);
-            //完成请删除
-
+            //测试数据，发布请删除
+            if(TaskIds.Count == 0)
+            {
+                TaskIds.Add(2);
+                TaskIds.Add(3);
+            }
             InitCombobox();
             InitWorker();
             DispatcherHelper.Initialize();
@@ -143,8 +144,18 @@ namespace MvvmLight4.ViewModel
         private void ExecuteLoadedCmd()
         {
             SelectAllWithoutWatch();
+            CheckWorkerState();
             Messenger.Default.Send("disEnableDeleteBtn", "BTVM2BTV");
         }
+
+        private void CheckWorkerState()
+        {
+            if(worker!=null && worker.IsBusy)
+            {
+                worker.CancelAsync();
+            }
+        }
+
         void SelectAllWithoutWatch()
         {
             ///修改
@@ -159,6 +170,15 @@ namespace MvvmLight4.ViewModel
                 {
                     ErrorNum++;
                 }
+            }
+        }
+
+        public RelayCommand ClosedCmd { get; private set; }
+        public void ExecuteClosedCmd()
+        {
+            if(worker!=null && worker.IsBusy)
+            {
+                worker.CancelAsync();
             }
         }
 
@@ -327,6 +347,7 @@ namespace MvvmLight4.ViewModel
             SelectCommand = new RelayCommand<AbnormalViewModel>((p) => ExecuteSelectCommand(p), CanExecuteSelectCommand);
             TypeChangedCmd = new RelayCommand(() => ExecuteTypeChangedCmd());
             DeleteCmd = new RelayCommand<int>((p) => ExecuteDeleteCmd(p), CanExecuteDeleteCmd);
+            ClosedCmd = new RelayCommand(() => ExecuteClosedCmd());
         }
 
         public void InitWorker()
