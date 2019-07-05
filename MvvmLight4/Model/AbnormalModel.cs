@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace MvvmLight4.Model
 {
+    /// <summary>
+    /// 异常具体信息
+    /// </summary>
     public class AbnormalModel : ObservableObject
     {
         public AbnormalModel() { }

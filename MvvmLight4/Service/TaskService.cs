@@ -56,17 +56,5 @@ namespace MvvmLight4.Service
                 return id;
             }
         }
-
-        /// <summary>
-        /// 回溯界面
-        /// 根据传来的taskId得到异常
-        /// 暂未使用
-        /// </summary>
-        /// <param name="taskId"></param>
-        /// <returns></returns>
-        public string GetVideosByTaskId(int taskId)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

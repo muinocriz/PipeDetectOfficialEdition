@@ -11,6 +11,5 @@ namespace MvvmLight4.Service
     {
         int GetLastTaskId();
         void AddTask(TaskModel Task);
-        string GetVideosByTaskId(int taskId);
     }
 }

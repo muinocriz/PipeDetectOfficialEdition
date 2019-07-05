@@ -9,9 +9,7 @@ namespace MvvmLight4.Service
     interface IFileDialogService
     {
         string OpenFileDialog(string srcFilter = "");
-        IList<string> OpenFileDialogMultiselect(string srcFilter = "");
         string OpenFolderBrowserDialog();
         string OpenSaveFileDialog();
-
     }
 }

@@ -20,24 +20,6 @@ namespace MvvmLight4.Service
         }
 
         /// <summary>
-        /// 分帧界面
-        /// 检测视频是否已导入
-        /// 已弃用
-        /// </summary>
-        /// <param name="path">视频位置</param>
-        /// <returns></returns>
-        public int HasVideoPath(string path)
-        {
-            using (IDbConnection conn = SqlHelper.GetConnection())
-            {
-                conn.Open();
-                var sql = @"SELECT COUNT(*) AS COUNT FROM TB_METADATA WHERE VIDEOPATH==@path;";
-                int Count = Convert.ToInt32(conn.Query(sql, new { path = path }).FirstOrDefault().COUNT);
-                return Count;
-            }
-        }
-
-        /// <summary>
         /// 分帧文件选择界面
         /// 加载已导入未分帧的视频信息
         /// </summary>
@@ -237,29 +219,6 @@ namespace MvvmLight4.Service
                 {
                     FramePath,
                     VideoPath
-                });
-                return result;
-            }
-        }
-
-        /// <summary>
-        /// 分帧界面
-        /// 更新分帧间距
-        /// 已弃用
-        /// </summary>
-        /// <param name="path">视频位置</param>
-        /// <param name="i">每秒帧数</param>
-        /// <returns></returns>
-        public int UpdateInterval(string path, int i)
-        {
-            using (IDbConnection conn = SqlHelper.GetConnection())
-            {
-                conn.Open();
-                var sql = @"UPDATE TB_METADATA SET INTERVAL=@I WHERE VIDEOPATH=@PATH";
-                int result = conn.Execute(sql, new
-                {
-                    @I = i,
-                    @PATH = path
                 });
                 return result;
             }
