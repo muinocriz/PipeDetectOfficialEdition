@@ -3,7 +3,6 @@ using System.IO;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
-using MvvmLight4.Model;
 using MvvmLight4.Service;
 
 namespace MvvmLight4.ViewModel
