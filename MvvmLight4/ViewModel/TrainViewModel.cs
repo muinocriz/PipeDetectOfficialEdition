@@ -8,7 +8,6 @@ using MvvmLight4.Service;
 using Newtonsoft.Json;
 using System;
 using System.ComponentModel;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
@@ -17,7 +16,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Threading;
 
 namespace MvvmLight4.ViewModel
 {

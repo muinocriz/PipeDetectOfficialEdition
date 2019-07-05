@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MvvmLight4.Model
+﻿namespace MvvmLight4.Model
 {
+    /// <summary>
+    /// 检测任务
+    /// </summary>
     public class TaskModel
     {
         public TaskModel() { }
