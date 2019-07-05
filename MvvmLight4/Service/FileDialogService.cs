@@ -30,11 +30,6 @@ namespace MvvmLight4.Service
             return dialog.FileName;
         }
 
-        public IList<string> OpenFileDialogMultiselect(string srcFilter = "")
-        {
-            return null;
-        }
-
         /// <summary>
         /// 打开路径选择对话框
         /// </summary>
