@@ -146,6 +146,7 @@
     <Compile Include="Common\CmdHelper.cs" />
     <Compile Include="Common\DetectChooseConverter.cs" />
     <Compile Include="Common\FileComparer.cs" />
+    <Compile Include="Common\FrameTime.cs" />
     <Compile Include="Common\ImageHelper.cs" />
     <Compile Include="Common\IntToAbnormalConverter.cs" />
     <Compile Include="Common\IntToBoolConverter.cs" />

@@ -5,6 +5,7 @@ using MvvmLight4.Service;
 using Newtonsoft.Json;
 using System;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.IO;
 using System.Windows;
 
@@ -15,9 +16,15 @@ namespace MvvmLight4.ViewModel
         public SetViewModel()
         {
             AssignCommands();
+            string frameTimeString = ConfigurationManager.AppSettings["FrameTime"];
+            SelFrameTime = Convert.ToInt32(frameTimeString);
             AbnormalTypes = AbnormalService.GetService().GetAbnormalTypeModels();
         }
-
+        private int selFrameTime;
+        public int SelFrameTime
+        {
+            get => selFrameTime; set { selFrameTime = value; RaisePropertyChanged(() => SelFrameTime); }
+        }
         private ObservableCollection<AbnormalTypeModel> abnormalTypes;
         public ObservableCollection<AbnormalTypeModel> AbnormalTypes
         {
@@ -49,10 +56,29 @@ namespace MvvmLight4.ViewModel
             MessageBox.Show("已保存");
         }
 
+        public RelayCommand UpdateFTCmd { get; private set; }
+        private void ExecuteUpdateFTCmd()
+        {
+            Console.WriteLine(SelFrameTime);
+
+            // Open App.Config of executable
+            Configuration config =
+                ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            // You need to remove the old settings object before you can replace it
+            config.AppSettings.Settings.Remove("FrameTime");
+            // Add an Application Setting.
+            config.AppSettings.Settings.Add("FrameTime", Convert.ToString(SelFrameTime));
+            // Save the changes in App.config file.
+            config.Save(ConfigurationSaveMode.Modified);
+            // Force a reload of a changed section.
+            ConfigurationManager.RefreshSection("appSettings");
+        }
+
         #region helper function
         private void AssignCommands()
         {
-            SelectAbnormal = new RelayCommand(() =>ExecuteSelect());
+            SelectAbnormal = new RelayCommand(() => ExecuteSelect());
+            UpdateFTCmd = new RelayCommand(() => ExecuteUpdateFTCmd());
         }
         #endregion
     }

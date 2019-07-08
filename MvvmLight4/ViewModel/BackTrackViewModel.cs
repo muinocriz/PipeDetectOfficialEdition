@@ -29,7 +29,7 @@ namespace MvvmLight4.ViewModel
                 TaskIds = msg;
             });
             //测试数据，发布请删除
-            if(TaskIds.Count == 0)
+            if (TaskIds.Count == 0)
             {
                 TaskIds.Add(2);
                 TaskIds.Add(3);
@@ -149,7 +149,7 @@ namespace MvvmLight4.ViewModel
 
         private void CheckWorkerState()
         {
-            if(worker!=null && worker.IsBusy)
+            if (worker != null && worker.IsBusy)
             {
                 worker.CancelAsync();
             }
@@ -175,10 +175,7 @@ namespace MvvmLight4.ViewModel
         public RelayCommand ClosedCmd { get; private set; }
         public void ExecuteClosedCmd()
         {
-            if(worker!=null && worker.IsBusy)
-            {
-                worker.CancelAsync();
-            }
+            CheckWorkerState();
         }
 
         #region 选择了DataGrid的某一项
@@ -189,6 +186,8 @@ namespace MvvmLight4.ViewModel
 
         private bool CanExecuteSelectCommand(AbnormalViewModel p)
         {
+            CheckWorkerState();
+            
             return !string.IsNullOrEmpty(p.Meta.FramePath);
         }
 
@@ -197,7 +196,6 @@ namespace MvvmLight4.ViewModel
             Debug.WriteLine("worker.isBusy:" + worker.IsBusy);
             if (worker.IsBusy)
             {
-                worker.CancelAsync();
                 return;
             }
 
@@ -213,13 +211,13 @@ namespace MvvmLight4.ViewModel
             //播放视频
             //找到文件
             InitPlayer(p);
-            worker.RunWorkerAsync(player);
+            worker.RunWorkerAsync(Player);
         }
         void InitPlayer(AbnormalViewModel p)
         {
             string folderPath = p.Meta.FramePath;
 
-            player = new PlayerModel
+            Player = new PlayerModel
             {
                 Target = Convert.ToInt32(p.Abnormal.Position)//目标帧号
             };
@@ -233,7 +231,7 @@ namespace MvvmLight4.ViewModel
                     string name = item.FullName;
                     imagePath.Add(name);
                 }
-                player.Calculate(imagePath.Count, 120);
+                Player.Calculate(imagePath.Count);
             }
             catch (PathTooLongException)
             {
@@ -261,6 +259,7 @@ namespace MvvmLight4.ViewModel
         /// <param name="p"></param>
         private void ExecuteDeleteCmd(int p)
         {
+            CheckWorkerState();
             Debug.WriteLine("get abnornal id :" + p);
             Messenger.Default.Send("disEnableDeleteBtn", "BTVM2BTV");
             //修改列表显示
@@ -364,8 +363,8 @@ namespace MvvmLight4.ViewModel
         private void Worker_DoWork(object sender, DoWorkEventArgs e)
         {
             PlayerModel p = (PlayerModel)e.Argument;
-            int nowPic = player.StartNum;
-            int end = player.EndNum;
+            int nowPic = p.StartNum;
+            int end = p.EndNum;
 
             while (nowPic <= end)
             {
@@ -376,7 +375,7 @@ namespace MvvmLight4.ViewModel
                     return;
                 }
                 worker.ReportProgress(nowPic++);
-                Thread.Sleep(player.Speed);
+                Thread.Sleep(p.Speed);
             }
         }
 
@@ -390,7 +389,6 @@ namespace MvvmLight4.ViewModel
 
         private void Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Debug.WriteLine("进入完成函数");
             if (e.Cancelled)
                 Debug.WriteLine("本条目回溯中断");
             else

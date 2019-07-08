@@ -1,9 +1,10 @@
 ﻿using GalaSoft.MvvmLight;
 using System;
+using System.Configuration;
 
 namespace MvvmLight4.Model
 {
-    public class PlayerModel: ObservableObject
+    public class PlayerModel : ObservableObject
     {
         private int target;
         /// <summary>
@@ -38,23 +39,29 @@ namespace MvvmLight4.Model
             Folder = "";
         }
         //计算StartNum和EndNum
-        public void Calculate(int length,int Duration=120)
+        public void Calculate(int length)
         {
-            Console.WriteLine("长度：" + length);
-            if(length<=250)
+            string frameTimeString = ConfigurationManager.AppSettings["FrameTime"];
+            int duration = string.IsNullOrEmpty(frameTimeString) ? 250 : Convert.ToInt32(frameTimeString) * 25;
+            if (length < duration)
             {
                 StartNum = 0;
                 EndNum = length - 1;
             }
-            else if (length-Target<250)
+            else if (length - Target < (duration / 2))
             {
-                StartNum = length - Duration;
-                EndNum = 2*target-Duration-(length-1);
+                StartNum = Target - duration / 2;
+                EndNum = length - 1;
+            }
+            else if (Target < duration / 2)
+            {
+                StartNum = 0;
+                EndNum = Target + duration / 2;
             }
             else
             {
-                StartNum = Target - Duration;
-                endNum = Target + Duration;
+                StartNum = Target - duration / 2;
+                EndNum = Target + duration / 2;
             }
             Console.WriteLine("Target：" + Target);
             Console.WriteLine("StartNum：" + StartNum);
