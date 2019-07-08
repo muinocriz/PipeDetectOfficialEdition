@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:MvvmLight4.View"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:src="clr-namespace:MvvmLight4.Common"
     Title="设置"
     Width="600"
     Height="450"
@@ -79,6 +80,33 @@
                             Command="{Binding SelectAbnormal}"
                             Content="确定" />
                     </Grid>
+                </Grid>
+            </TabItem>
+            <TabItem FontFamily="/MvvmLight4;component/Font/#Source Han Sans CN" Header="时长设置">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="20" />
+                        <RowDefinition />
+                        <RowDefinition Height="25" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Grid.Row="1">
+                        <StackPanel.Resources>
+                            <src:FrameTime x:Key="FrameTime" />
+                        </StackPanel.Resources>
+                        <Label Content="回溯时间总长度" />
+                        <ComboBox
+                            Name="FrameTimeCB"
+                            IsEditable="True"
+                            IsReadOnly="True"
+                            ItemsSource="{StaticResource FrameTime}"
+                            SelectedValue="{Binding SelFrameTime}" />
+                    </StackPanel>
+                    <Button
+                        Grid.Row="2"
+                        Width="80"
+                        HorizontalAlignment="Right"
+                        Command="{Binding UpdateFTCmd}"
+                        Content="确定" />
                 </Grid>
             </TabItem>
         </TabControl>
