@@ -27,7 +27,6 @@ namespace MvvmLight4.ViewModel
         private BackgroundWorker worker;
         private List<ComplexInfoModel> combboxList;
         private Dictionary<string, string> dict;
-        private List<ExportModel> exportModelsForExcel;
         private List<AbnormalViewModel> list;
         private Dictionary<int, AbnormalTypeModel> typeDict;
         private List<ExportData> exportDatas;
@@ -102,20 +101,6 @@ namespace MvvmLight4.ViewModel
             {
                 selectAll = value;
                 RaisePropertyChanged(() => SelectAll);
-            }
-        }
-
-        private ObservableCollection<ExportModel> exports;
-        /// <summary>
-        /// 要输出的属性
-        /// </summary>
-        public ObservableCollection<ExportModel> Exports
-        {
-            get { return exports; }
-            set
-            {
-                exports = value;
-                RaisePropertyChanged(() => Exports);
             }
         }
 
