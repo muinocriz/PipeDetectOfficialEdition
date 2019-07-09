@@ -147,5 +147,13 @@ namespace MvvmLight4.Model
         /// 3000：已被修改
         /// </summary>
         public int State { get => state; set => state = value; }
+        private int isMulti;
+        /// <summary>
+        /// 是否在一张图片上存在着多个异常
+        /// 0：不存在
+        /// 1：存在
+        /// </summary>
+        public int IsMulti { get => isMulti; set => isMulti = value; }
+
     }
 }

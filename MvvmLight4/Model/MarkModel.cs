@@ -40,16 +40,5 @@ namespace MvvmLight4.Model
         /// 保存路径
         /// </summary>
         public string Path { get => path; set { path = value; RaisePropertyChanged(() => Path); } }
-        //public int w;
-        ///// <summary>
-        ///// 截图宽
-        ///// </summary>
-        //public int W { get => w; set { w = value; RaisePropertyChanged(() => W); } }
-        //public int h;
-        ///// <summary>
-        ///// 截图高
-        ///// </summary>
-        //public int H { get => h; set { h = value; RaisePropertyChanged(() => H); } }
-
     }
 }
