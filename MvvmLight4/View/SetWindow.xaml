@@ -85,7 +85,7 @@
             <TabItem FontFamily="/MvvmLight4;component/Font/#Source Han Sans CN" Header="时长设置">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="20" />
+                        <RowDefinition Height="5" />
                         <RowDefinition />
                         <RowDefinition Height="25" />
                     </Grid.RowDefinitions>
@@ -96,6 +96,9 @@
                         <Label Content="回溯时间总长度" />
                         <ComboBox
                             Name="FrameTimeCB"
+                            Width="100"
+                            Margin="6,0"
+                            HorizontalAlignment="Left"
                             IsEditable="True"
                             IsReadOnly="True"
                             ItemsSource="{StaticResource FrameTime}"

@@ -35,7 +35,7 @@ namespace MvvmLight4
             Debug.WriteLine("main window xaml get task id :" + taskId);
             if (taskId >= 0)
             {
-                MessageBoxResult result = MessageBox.Show(text, "通知", MessageBoxButton.YesNo);
+                MessageBoxResult result = MessageBox.Show(text, "回溯未完成", MessageBoxButton.YesNo);
                 if (result == MessageBoxResult.Yes)
                 {
                     list.Add(taskId);

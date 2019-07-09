@@ -63,9 +63,8 @@ namespace MvvmLight4.Model
                 StartNum = Target - duration / 2;
                 EndNum = Target + duration / 2;
             }
-            Console.WriteLine("Target：" + Target);
-            Console.WriteLine("StartNum：" + StartNum);
-            Console.WriteLine("EndNum：" + EndNum);
+            Console.WriteLine("Target：" + Target+ "\tStartNum：" + StartNum+ "\tEndNum：" + EndNum);
+            Console.WriteLine("持续时间："+(EndNum-StartNum)/25+"秒");
         }
     }
 }
