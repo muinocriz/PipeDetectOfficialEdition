@@ -118,6 +118,12 @@ namespace MvvmLight4.Service
                 return result;
             }
         }
+        /// <summary>
+        /// 人工回溯界面
+        /// 获取未查看的所有异常
+        /// </summary>
+        /// <param name="TaskIds"></param>
+        /// <returns></returns>
 
         public ObservableCollection<AbnormalViewModel> SelectAllWithoutWatch(List<int> TaskIds)
         {
@@ -215,6 +221,27 @@ namespace MvvmLight4.Service
                 {
                     return 0;
                 }
+            }
+        }
+
+        /// <summary>
+        /// 人工回溯界面
+        /// 根据当前id添加一项数据到数据库中
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public int AddItem(int id)
+        {
+            using (IDbConnection conn = SqlHelper.GetConnection())
+            {
+                conn.Open();
+                var sql = @"INSERT INTO TB_ABNORMAL (VIDEOID,POSITION,TYPE,STATE,TASKID)
+                            SELECT VIDEOID,POSITION,TYPE,STATE,TASKID
+                            FROM TB_ABNORMAL
+                            WHERE ID=@id;";
+                sql += "SELECT CAST(last_insert_rowid() as int);";
+                int result = conn.Query<int>(sql, new { id }).FirstOrDefault();
+                return result;
             }
         }
     }

@@ -29,11 +29,10 @@ namespace MvvmLight4.ViewModel
                 TaskIds = msg;
             });
             //测试数据，发布请删除
-            if (TaskIds.Count == 0)
-            {
-                TaskIds.Add(2);
-                TaskIds.Add(3);
-            }
+            //if (TaskIds.Count == 0)
+            //{
+            //    TaskIds.Add(2);
+            //}
             InitCombobox();
             InitWorker();
             DispatcherHelper.Initialize();
@@ -187,7 +186,7 @@ namespace MvvmLight4.ViewModel
         private bool CanExecuteSelectCommand(AbnormalViewModel p)
         {
             CheckWorkerState();
-            
+
             return !string.IsNullOrEmpty(p.Meta.FramePath);
         }
 
@@ -251,7 +250,7 @@ namespace MvvmLight4.ViewModel
 
         private bool CanExecuteDeleteCmd(int arg)
         {
-            return arg >= 0;
+            return SelectedAVM != null && arg >= 0;
         }
         /// <summary>
         /// 删除选择项
@@ -262,12 +261,19 @@ namespace MvvmLight4.ViewModel
             CheckWorkerState();
             Debug.WriteLine("get abnornal id :" + p);
             Messenger.Default.Send("disEnableDeleteBtn", "BTVM2BTV");
+
+            bool isAbnormal = true;
+
             //修改列表显示
             for (int i = 0; i < AbnormalVMs.Count; i++)
             {
                 if (AbnormalVMs[i].AbnormalId == p)
                 {
                     Debug.WriteLine("get item in AbnormalVMs :" + p);
+                    if (AbnormalVMs[i].Abnormal.Type == 0 || AbnormalVMs[i].Abnormal.Type == 6)
+                    {
+                        isAbnormal = false;
+                    }
                     DispatcherHelper.CheckBeginInvokeOnUI(() =>
                     {
                         AbnormalVMs.RemoveAt(i);
@@ -276,18 +282,90 @@ namespace MvvmLight4.ViewModel
             }
             //修改右下角展示区显示
             //重新计算现有的总异常
-            ErrorNum = 0;
-            foreach (var item in abnormalVMs)
+            if (isAbnormal)
             {
-                if (item.Abnormal.Type != 0 && item.Abnormal.Type != 6)
-                {
-                    ErrorNum++;
-                }
+                ErrorNum--;
             }
             //总数由abnormalVMs.Count直接生成切无需更改
             //删除数据库
             AbnormalService.GetService().DeleteItem(p);
         }
+        #endregion
+        #region 添加一项异常
+        public RelayCommand<int> AddCmd { get; private set; }
+        public bool CanExecuteAddCmd(int arg)
+        {
+            return SelectedAVM != null && arg >= 0;
+        }
+        public void ExecuteAddCmd(int p)
+        {
+            CheckWorkerState();
+            Debug.WriteLine("get abnornal id :" + p);
+
+            //修改数据库
+            int newId = AbnormalService.GetService().AddItem(p);
+
+            bool isAbnormal = true;
+
+
+
+            //修改列表显示
+            for (int i = 0; i < AbnormalVMs.Count; i++)
+            {
+                if (AbnormalVMs[i].AbnormalId == p)
+                {
+                    Debug.WriteLine("get item in AbnormalVMs :" + p);
+
+                    if (AbnormalVMs[i].Abnormal.Type == 0 || AbnormalVMs[i].Abnormal.Type == 6)
+                    {
+                        isAbnormal = false;
+                    }
+
+                    AbnormalViewModel abnormalViewModel = AbnormalVMs[i];
+                    
+
+                    MetaModel mm = new MetaModel();
+                    AbnormalModel am = new AbnormalModel();
+                    AbnormalViewModel avm = new AbnormalViewModel();
+
+                    mm.Addr = abnormalViewModel.Meta.Addr;
+                    mm.PipeCode = abnormalViewModel.Meta.PipeCode;
+                    mm.PipeType = (int)abnormalViewModel.Meta.PipeType;
+                    mm.FramePath = abnormalViewModel.Meta.FramePath;
+                    if (!string.IsNullOrEmpty(abnormalViewModel.Meta.StartTime))
+                        mm.StartTime = abnormalViewModel.Meta.StartTime;
+                    else
+                        mm.StartTime = "未填写";
+
+                    am.VideoId = (int)abnormalViewModel.Abnormal.VideoId;
+                    am.Type = (int)abnormalViewModel.Abnormal.Type;
+                    am.Position = abnormalViewModel.Abnormal.Position;
+                    //新加的状态和任务编号
+                    am.State = 1000;
+                    am.TaskId = (int)abnormalViewModel.Abnormal.TaskId;
+
+                    avm.AbnormalId = newId;
+                    avm.Meta = mm;
+                    avm.Abnormal = am;
+
+                    DispatcherHelper.CheckBeginInvokeOnUI(() =>
+                    {
+                        AbnormalVMs.Insert(i, avm);
+                    });
+                    break;
+                }
+            }
+
+
+            //修改右下角展示区显示
+            //重新计算现有的总异常
+            if (isAbnormal)
+            {
+                ErrorNum++;
+            }
+
+        }
+
         #endregion
         #region ComboxItem被更改
         /// <summary>
@@ -322,6 +400,11 @@ namespace MvvmLight4.ViewModel
                 }
             }
         }
+
+        public bool CanExecuteTypeChangedCmd()
+        {
+            return SelectedAVM != null;
+        }
         #endregion
 
         #region 辅助方法
@@ -343,9 +426,10 @@ namespace MvvmLight4.ViewModel
         {
             LoadedCmd = new RelayCommand(() => ExecuteLoadedCmd());
             SelectCommand = new RelayCommand<AbnormalViewModel>((p) => ExecuteSelectCommand(p), CanExecuteSelectCommand);
-            TypeChangedCmd = new RelayCommand(() => ExecuteTypeChangedCmd());
+            TypeChangedCmd = new RelayCommand(() => ExecuteTypeChangedCmd(), CanExecuteTypeChangedCmd);
             DeleteCmd = new RelayCommand<int>((p) => ExecuteDeleteCmd(p), CanExecuteDeleteCmd);
             ClosedCmd = new RelayCommand(() => ExecuteClosedCmd());
+            AddCmd = new RelayCommand<int>((arg) => ExecuteAddCmd(arg), CanExecuteAddCmd);
         }
 
         public void InitWorker()

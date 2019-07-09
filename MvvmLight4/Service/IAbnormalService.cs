@@ -14,5 +14,6 @@ namespace MvvmLight4.Service
         int DeleteItem(int id);
         void ChangeState(int abnormalId, int state);
         int SearchLastTaskById(int taskId);
+        int AddItem(int id);
     }
 }
