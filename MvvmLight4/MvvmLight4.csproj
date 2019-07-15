@@ -142,6 +142,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Common\Base64Helper.cs" />
     <Compile Include="Common\BGConverter.cs" />
     <Compile Include="Common\CmdHelper.cs" />
     <Compile Include="Common\DetectChooseConverter.cs" />
@@ -152,6 +153,7 @@
     <Compile Include="Common\IntToBoolConverter.cs" />
     <Compile Include="Common\IntToDoubleConverter.cs" />
     <Compile Include="Common\MessageHelper.cs" />
+    <Compile Include="Common\RegeditHelper.cs" />
     <Compile Include="Common\SqlHelper.cs" />
     <Compile Include="Common\TimeConverter.cs" />
     <Compile Include="Design\DesignDataService.cs" />

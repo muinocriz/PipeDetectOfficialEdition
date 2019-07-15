@@ -442,7 +442,7 @@ namespace MvvmLight4.ViewModel
                                 abnormalModels.Add(abnormalModel);
 
                                 //日志
-                                log = "帧号：\t" + _position + "\t异常类型\t" + _type + "\t缺陷位置\t" + m;
+                                log = "帧号：\t" + _position + "\t异常类型\t" + _type + "\t缺陷位置\t" + m + "\t任务编号" + Task.Id;
 
                                 worker.ReportProgress(progress, log);
                             }

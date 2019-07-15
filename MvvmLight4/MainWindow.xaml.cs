@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using GalaSoft.MvvmLight.Messaging;
+using MvvmLight4.Common;
 using MvvmLight4.Service;
 using MvvmLight4.View;
 using MvvmLight4.ViewModel;
@@ -47,7 +49,7 @@ namespace MvvmLight4
                 {
                     return;
                 }
-                
+
             }
             list = null;
         }
@@ -56,10 +58,22 @@ namespace MvvmLight4
 
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            string winName = ((Button)e.OriginalSource).Tag.ToString();
-            Window win = ((Window)_assembly.CreateInstance(string.Format("MvvmLight4.View.{0}", winName)));
-            win.Owner = this;
-            win.ShowDialog();
+            string targetDayBase64 = RegeditHelper.GetRegedit("sd");
+            string targetDayString = Base64Helper.DecodeBase64("utf-8", targetDayBase64);
+            DateTime dt = DateTime.Parse(targetDayString);
+            int result = DateTime.Compare(DateTime.Now, dt);
+
+            if (result > 0)
+            {
+                return;
+            }
+            else
+            {
+                string winName = ((Button)e.OriginalSource).Tag.ToString();
+                Window win = ((Window)_assembly.CreateInstance(string.Format("MvvmLight4.View.{0}", winName)));
+                win.Owner = this;
+                win.ShowDialog();
+            }
         }
     }
 }
