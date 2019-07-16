@@ -145,15 +145,9 @@ namespace MvvmLight4.ViewModel
                     //大图
                     command = "-i" + " " + videoPath + " " + "-q:v 10 " + target + "\\%6d.jpg";
                     break;
-                case 1:
-                    //小图
-                    command = "-i" + " " + videoPath + " " + "-s 9x8 " + target + "\\%6d.jpg";
-                    break;
                 default:
                     return;
             }
-            //command = "-i" + " " + videoPath + " " + target + "\\%6d.jpg";
-            Debug.WriteLine(DateTime.Now);
             p.StartInfo.FileName = "ffmpeg.exe";
             p.StartInfo.Arguments = command;
             p.StartInfo.UseShellExecute = true;
@@ -181,7 +175,7 @@ namespace MvvmLight4.ViewModel
                 worker.CancelAsync();
             }
             Process[] processes = Process.GetProcessesByName("ffmpeg");
-            if(processes!=null && processes.Length>0)
+            if (processes != null && processes.Length > 0)
             {
                 foreach (var item in processes)
                 {
@@ -294,15 +288,12 @@ namespace MvvmLight4.ViewModel
                 watch.Start();
 
                 string framePathWithDirectory = Path.GetFileNameWithoutExtension(MetaList[i].VideoPath);
-
-                //小图
-                string target = TargetPath + @"\" + framePathWithDirectory + @"\smallimg";
+                
                 //大图
                 string target1 = TargetPath + @"\" + framePathWithDirectory + @"\bigimg";
 
                 try
                 {
-                    Directory.CreateDirectory(target);
                     Directory.CreateDirectory(target1);
                 }
                 catch (Exception fileExpt)
@@ -310,8 +301,7 @@ namespace MvvmLight4.ViewModel
                     Debug.WriteLine("创建文件夹失败：" + fileExpt.ToString());
                     return;
                 }
-
-                Cut(MetaList[i].VideoPath, target, 1);
+                
                 Cut(MetaList[i].VideoPath, target1, 0);
 
                 watch.Stop();
@@ -372,7 +362,7 @@ namespace MvvmLight4.ViewModel
             }
             catch (Exception)
             {
-                TargetPath=@"C:\";
+                TargetPath = @"C:\";
             }
             BtnContent = "请点击";
             ProgV = Visibility.Hidden;
