@@ -59,6 +59,12 @@ namespace MvvmLight4
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             string targetDayBase64 = RegeditHelper.GetRegedit("sd");
+            if (string.IsNullOrEmpty(targetDayBase64))
+            {
+                MessageBox.Show("权限不足，请使用管理员权限运行程序");
+                return;
+            }
+
             string targetDayString = Base64Helper.DecodeBase64("utf-8", targetDayBase64);
             DateTime dt = DateTime.Parse(targetDayString);
             int result = DateTime.Compare(DateTime.Now, dt);
