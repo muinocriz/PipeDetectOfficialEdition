@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Windows;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using GalaSoft.MvvmLight.Messaging;
@@ -24,7 +25,12 @@ namespace MvvmLight4.ViewModel
         private void ExecuteLoadedCmd()
         {
             //写注册表
-            RegeditHelper.SetRegedit("sd", "MjAxOS0wOC0zMQ==");
+            bool isSuccess = RegeditHelper.SetRegedit("sd", "MjAxOS0wOC0zMQ==");
+            if(!isSuccess)
+            {
+                MessageBox.Show("权限不足，请使用管理员权限运行程序");
+                return;
+            }
 
             string dbName = "data.sqlite";
             if (!File.Exists(dbName))
