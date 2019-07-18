@@ -25,8 +25,9 @@ namespace MvvmLight4.ViewModel
         private void ExecuteLoadedCmd()
         {
             //写注册表
-            bool isSuccess = RegeditHelper.SetRegedit("sd", "MjAxOS0wOC0zMQ==");
-            if(!isSuccess)
+            bool isSdSuccess = RegeditHelper.SetRegedit("Sd", "MjAxOS0wOC0zMQ==");
+            bool isStSuccess = RegeditHelper.SetRegedit("St", "bm9ybWFs");
+            if (!isSdSuccess || !isStSuccess)
             {
                 MessageBox.Show("权限不足，请使用管理员权限运行程序");
                 return;

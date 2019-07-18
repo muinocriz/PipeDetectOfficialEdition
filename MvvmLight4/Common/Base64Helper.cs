@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Net;
 using System.Text;
 
 namespace MvvmLight4.Common
@@ -40,6 +42,26 @@ namespace MvvmLight4.Common
                 decode = code;
             }
             return decode;
+        }
+
+        public static string GetTime()
+        {
+            try
+            {
+                var myHttpWebRequest = (HttpWebRequest)WebRequest.Create("http://www.baidu.com");
+                var response = myHttpWebRequest.GetResponse();
+                string todaysDates = response.Headers["date"];
+                return DateTime.ParseExact(todaysDates,
+                                           "ddd, dd MMM yyyy HH:mm:ss 'GMT'",
+                                           CultureInfo.InvariantCulture.DateTimeFormat,
+                                           DateTimeStyles.AssumeUniversal).ToString("yyyy-MM-dd");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("发生异常：{0}", e.ToString());
+                return DateTime.Now.ToString("yyyy-MM-dd");
+            }
+
         }
     }
 }
