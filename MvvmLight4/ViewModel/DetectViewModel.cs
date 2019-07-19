@@ -333,7 +333,7 @@ namespace MvvmLight4.ViewModel
 
             var t = new Task(() =>
             {
-                Process p = CmdHelper.RunProcess(@"Util/main.exe", "-predict -empty");
+                Process p = CmdHelper.RunProcess(@".\Util\GD.exe", "-predict -empty");
 
                 p.Start();
                 processId = p.Id;
@@ -678,7 +678,16 @@ namespace MvvmLight4.ViewModel
         /// <param name="trainProcessPID">线程号</param>
         private void ColseFun(int id)
         {
-            Process process = Process.GetProcessById(id);
+            try
+            {
+                Process process = Process.GetProcessById(id);
+            }
+            catch (Exception)
+            {
+                Debug.WriteLine("process is not existed");
+                return;
+            }
+
             ManagementObjectSearcher searcher
                 = new ManagementObjectSearcher("select * from Win32_Process where ParentProcessID=" + id);
             ManagementObjectCollection moc = searcher.Get();

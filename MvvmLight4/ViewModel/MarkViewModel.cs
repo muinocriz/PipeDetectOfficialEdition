@@ -283,8 +283,14 @@ namespace MvvmLight4.ViewModel
 
             //"C:\Users\超\Desktop\2019-01-02 16-08-00" + "/2/"
             string path = SavePath + @"/" + Convert.ToString(AbnormalType.Type) + @"/" + filename;
-
-            ImageHelper.Caijianpic(imagePath[CurrentFramePosition], path + "_1" + ".jpg", p.X * 1.0 / img.ActualWidth, p.Y * 1.0 / img.ActualHeight, 416, 416);
+            if (AbnormalType.Type <= 6)
+            {
+                ImageHelper.Caijianpic(imagePath[CurrentFramePosition], path + "_1" + ".jpg", p.X * 1.0 / img.ActualWidth, p.Y * 1.0 / img.ActualHeight, 416, 416);
+            }
+            else if (AbnormalType.Type >= 7)
+            {
+                ImageHelper.SavePic(imagePath[CurrentFramePosition], path + "_1" + ".jpg");
+            }
 
             Debug.WriteLine("" + p.X * 1.0 / img.ActualWidth + "---" + p.Y * 1.0 / img.ActualHeight);
 
