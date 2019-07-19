@@ -28,11 +28,6 @@ namespace MvvmLight4.ViewModel
                 Debug.WriteLine("backtrack ViewModel get taskID: " + msg.ToString());
                 TaskIds = msg;
             });
-            //测试数据，发布请删除
-            //if (TaskIds.Count == 0)
-            //{
-            //    TaskIds.Add(2);
-            //}
             InitCombobox();
             InitWorker();
             DispatcherHelper.Initialize();
